@@ -3,6 +3,8 @@ require 'httparty'
 require 'nokogiri'
 require 'json'
 
+approved_pairs_url = 'http://cs.brown.edu/degrees/undergrad/concentrations/approvedpairs/'
+
 def get_pairs(table_rows)
   pairs = {}
   cur_course = nil
@@ -16,7 +18,11 @@ def get_pairs(table_rows)
   pairs
 end
 
-approved_pairs_url = 'http://cs.brown.edu/degrees/undergrad/concentrations/approvedpairs/'
+def get_nodes(pairs_hash)
+  pairs_hash
+    .inject([]) { |node_list, (key, value)| node_list + value.unshift(key) }
+    .uniq.sort.map { |e| {name: e} }
+end
 
 html = Nokogiri::HTML(HTTParty.get(approved_pairs_url))
 cs_table = html.css('table').children.first
@@ -25,9 +31,11 @@ eng_table = html.css('table').children.last
 cs_pairs = cs_table.children[1..-1]
 eng_pairs = eng_table.children[1..-1]
 
-cur_course = nil
-cs_pairs_hash = get_pairs cs_pairs
-eng_pairs_hash = get_pairs eng_pairs
+cs_pairs_hash = get_pairs(cs_pairs)
+eng_pairs_hash = get_pairs(eng_pairs)
 pairs_hash = cs_pairs_hash.merge(eng_pairs_hash)
+nodes = get_nodes(pairs_hash)
 
-File.open('pairs.json', 'w') { |file| file.write(JSON.pretty_generate(pairs_hash)) }
+binding.pry
+
+#File.open('pairs.json', 'w') { |file| file.write(JSON.pretty_generate(pairs_hash)) }
