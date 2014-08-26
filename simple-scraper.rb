@@ -24,6 +24,19 @@ def get_nodes(pairs_hash)
     .uniq.sort.map { |e| {name: e} }
 end
 
+def get_node_index(node_name, nodes)
+  nodes.find_index { |n| n[:name] == node_name }
+end
+
+def get_edges(pairs_hash, nodes)
+  pairs_hash.inject([]) do |edge_list, (key, value)|
+    source = get_node_index(key, nodes)
+    edge_list + value.map do |e|
+      { source: source, target: get_node_index(e, nodes) }
+    end
+  end
+end
+
 html = Nokogiri::HTML(HTTParty.get(approved_pairs_url))
 cs_table = html.css('table').children.first
 eng_table = html.css('table').children.last
@@ -35,7 +48,6 @@ cs_pairs_hash = get_pairs(cs_pairs)
 eng_pairs_hash = get_pairs(eng_pairs)
 pairs_hash = cs_pairs_hash.merge(eng_pairs_hash)
 nodes = get_nodes(pairs_hash)
+edges = get_edges(pairs_hash, nodes)
 
-binding.pry
-
-#File.open('pairs.json', 'w') { |file| file.write(JSON.pretty_generate(pairs_hash)) }
+File.open('pairs.json', 'w') { |file| file.write(JSON.pretty_generate(nodes: nodes, links: edges)) }
