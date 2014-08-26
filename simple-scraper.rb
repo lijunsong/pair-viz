@@ -21,7 +21,7 @@ end
 def get_nodes(pairs_hash)
   pairs_hash
     .inject([]) { |node_list, (key, value)| node_list + value.unshift(key) }
-    .uniq.sort.map { |e| {name: e} }
+    .uniq.sort.map { |e| { name: e } }
 end
 
 def get_node_index(node_name, nodes)
