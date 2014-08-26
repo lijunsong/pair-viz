@@ -10,10 +10,11 @@ def get_pairs(table_rows)
   cur_course = nil
   table_rows.each do |row|
     next if row.content == "\n"
-    cur_course = row.children.first.content unless row.children.first.content.empty?
+    cur_course = row.children.first.content.gsub("-", "") unless row.children.first.content.empty?
     children = row.children[1..-1]
     pairs[cur_course] = pairs.fetch(cur_course, []) +
-      children.map(&:content).select { |e| !e.empty? }
+      children.map(&:content).map { |e| e.gsub("-", "") }
+        .select { |e| !e.empty? }
   end
   pairs
 end
