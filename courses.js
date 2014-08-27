@@ -1,5 +1,5 @@
-var width = 1280;
-var height = 1000;
+var width = 800;
+var height = 600;
 
 var svg = d3.select("body").append("svg")
 .attr("width", width)
@@ -7,16 +7,23 @@ var svg = d3.select("body").append("svg")
 
 var force = d3.layout.force()
     .gravity(.05)
-    .distance(300)
+    .distance(100)
     .charge(-100)
     .size([width, height]);
 
-// highlight related node
-function highlight(related) {
-}
 
 function get_related_courses(n, dependencies) {
     return dependencies[n.index];
+}
+// this is undirected graph, so n1 should be in n2's
+// relation, vice versa.
+function is_related(n1, n2, dependencies) {
+    var related = dependencies[n2.index];
+    for(var i = 0; i < related.length; i++) {
+        if (related[i] == n1)
+            return true;
+    }
+    return false;
 }
 
 // map from course name to dependency name list
@@ -51,14 +58,25 @@ function run(error, json) {
         .data(json.nodes)
         .enter().append("g")
         .attr("class", "node")
-/*
+        .call(force.drag)
+        // XXX: following code does not work as I expect it.
         .on("mouseover", function(d) {
-            var related = get_related_courses(d, dependencies);
-            console.log(related);
-            //highlight(related);
+            // color each node
+            node.select("circle").attr("fill", function(n) {
+                if (is_related(n, d, dependencies)) return "red";
+                else
+                    return "#EEE";
+            });
+            node.select("text").attr("fill", function(n) {
+                if (is_related(n, d, dependencies)) return "red";
+                else
+                    return "#EEE";
+            });
         })
-*/
-        .call(force.drag);
+        .on("mouseout", function() {
+            node.select("circle").attr("fill", "steelblue");
+            node.select("text").attr("fill", "black");
+        });
 
     node.append("circle")
         .attr("r", 6);
