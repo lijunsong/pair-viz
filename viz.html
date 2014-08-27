@@ -7,32 +7,32 @@
       .link {
         fill: none;
         stroke: #666;
-        stroke-width: 1.5px;
+        stroke-width: 0.2px;
       }
       .node circle
       {
         fill: steelblue;
         stroke: #fff;
-        stroke-width: 1.5px;
+        stroke-width: 1px;
       }
       .node text
       {
         pointer-events: none;
-        font: 10px sans-serif;
+        font: 15px sans-serif;
       }
     </style>
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
   </head>
   <body>
     <script>
-      var width = 1100,
+      var width = 1300,
       height = 800
       var svg = d3.select("body").append("svg")
       .attr("width", width)
       .attr("height", height);
       var force = d3.layout.force()
       .gravity(.05)
-      .distance(150)
+      .distance(300)
       .charge(-100)
       .size([width, height]);
       d3.json("pairs.json", function(error, json) {
